@@ -31,7 +31,7 @@ export default function ProductCard({
 
   return (
     <div className="max-w-sm bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700">
-      <Link to={`/products/${item.id}`}>
+      <Link to={`/products/${item._id}`}>
         <img
           className="rounded-t-lg"
           src={
@@ -62,7 +62,7 @@ export default function ProductCard({
               Add to cart
             </button>
             <Link
-              to={`/products/${item.id}`}
+              to={`/products/${item._id}`}
               className="inline-flex items-center px-3 py-2 text-sm font-medium text-center text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
             >
               Details
@@ -86,13 +86,13 @@ export default function ProductCard({
         ) : (
           <div className="flex justify-between gap-[2rem] ">
             <Link
-              to={`/admin/edit-product/${item.id}`}
+              to={`/admin/edit-product/${item._id}`}
               className=" inline-flex items-center px-3 py-2 text-sm font-medium text-center text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
             >
               Edit
             </Link>
             <button
-              onClick={() => handleDelete(item.id)}
+              onClick={() => handleDelete(item._id)}
               className="px-3 py-2 text-sm font-medium text-center text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
             >
               Delete

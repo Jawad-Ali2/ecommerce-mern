@@ -1,98 +1,66 @@
-const Sequalize = require("sequelize");
+const mongodb = require("mongodb");
+const getDb = require("../utils/database").getDb;
 
-const sequelize = require("../utils/database");
+class Product {
+  constructor(title, price, description, imageUrl, id, userId) {
+    this.title = title;
+    this.price = price;
+    this.description = description;
+    this.imageUrl = imageUrl;
+    this._id = id && new mongodb.ObjectId(id);
+    this.userId = userId;
+  }
 
-const Product = sequelize.define("product", {
-  id: {
-    type: Sequalize.INTEGER,
-    autoIncrement: true,
-    allowNull: false,
-    primaryKey: true,
-  },
-  title: {
-    type: Sequalize.STRING,
-    allowNull: false,
-  },
-  price: {
-    type: Sequalize.DOUBLE,
-    allowNull: false,
-  },
-  description: {
-    type: Sequalize.TEXT,
-    allowNull: false,
-  },
-  imageUrl: {
-    type: Sequalize.STRING,
-    allowNull: false,
-  },
-});
+  save() {
+    const db = getDb();
+    let dbOp;
+    if (this._id) {
+      // update
+      dbOp = db
+        .collection("products")
+        .updateOne({ _id: this._id }, { $set: this });
+    } else {
+      dbOp = db.collection("products").insertOne(this);
+    }
+    return dbOp
+      .then((result) => {
+        console.log(result);
+      })
+      .catch((err) => console.log(err));
+  }
+
+  static fetchAll() {
+    const db = getDb();
+    return db
+      .collection("products")
+      .find()
+      .toArray()
+      .then((products) => {
+        return products;
+      })
+      .catch((err) => console.log(err));
+  }
+
+  static findById(id) {
+    const db = getDb();
+
+    return db
+      .collection("products")
+      .find({ _id: new mongodb.ObjectId(id) })
+      .next()
+      .then((product) => {
+        return product;
+      })
+      .catch((err) => console.log(err));
+  }
+
+  static deleteById(id) {
+    const db = getDb();
+
+    return db
+      .collection("products")
+      .deleteOne({ _id: new mongodb.ObjectId(id) });
+  }
+}
 
 module.exports = Product;
-
-// * OLD IMPLEMENTATION
-// const db = require("../utils/database");
-// const Cart = require("./cart");
-
-// module.exports = class Product {
-//   constructor(id, title, imageUrl, description, price) {
-//     this.id = id;
-//     this.title = title;
-//     this.imageUrl = imageUrl;
-//     this.description = description;
-//     this.price = price;
-//   }
-
-//   save() {
-//     console.log(this.title, this.price, this.description, this.imageUrl);
-//     return db.execute(
-//       "INSERT INTO products (title, price, description, imageUrl) VALUES (?, ?, ?, ?)",
-//       [this.title, this.price, this.description, this.imageUrl]
-//     );
-//   }
-
-//   update() {
-//     fs.readFile(p, (err, fileData) => {
-//       let products = [];
-//       if (!err) {
-//         products = JSON.parse(fileData);
-//       }
-
-//       // Now find the data with the id we want to update
-//       const productIndex = products.findIndex((prod) => prod.id === this.id);
-//       products[productIndex] = this;
-
-//       fs.writeFile(p, JSON.stringify(products), (err) => {
-//         console.log(err);
-//       });
-//     });
-//   }
-
-//   static fetchAll() {
-//     return db.execute("SELECT * FROM products");
-//   }
-
-//   static findById(id) {
-//     return db.execute("SELECT * FROM products WHERE id = ?", [id]);
-//   }
-
-//   static deleteProduct(id, cb) {
-//     fs.readFile(p, (err, data) => {
-//       let products = [];
-
-//       if (!err) {
-//         products = JSON.parse(data);
-//       }
-
-//       const product = products.find((prod) => prod.id === id);
-//       const updatedProducts = products.filter((prod) => prod.id !== id);
-//       fs.writeFile(p, JSON.stringify(updatedProducts), (err) => {
-//         if (!err) {
-//           // delete from cart
-//           Cart.deleteProduct(id, product.price);
-//         }
-//         cb(updatedProducts);
-//       });
-//       // return updatedProducts;
-//     });
-//   }
-// };

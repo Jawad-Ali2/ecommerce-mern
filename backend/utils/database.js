@@ -1,24 +1,32 @@
-// * // connects to the database
-// const mysql = require("mysql2");
+const mongodb = require("mongodb");
+require("dotenv").config();
 
-// * // Create pool keeps the connection open even after it's not being used
-// * // Create connection closes connection after each query making (makes it inefficient)
-// const pool = mysql.createPool({
-//   host: "localhost",
-//   user: "root",
-//   database: "node-js",
-//   password: "root",
-// });
+const MongoClient = mongodb.MongoClient;
 
-// module.exports = pool.promise();
+let _db;
 
-// Sequelize do the above steps implicitly so we don't need to write that code anymore
-const Sequalize = require("sequelize");
+const mongoConnect = (callback) => {
+  MongoClient.connect(
+    `mongodb+srv://${process.env.MONGODB_USERNAME}:${process.env.MONGODB_PASSWORD}@cluster0.i4mh4vu.mongodb.net/`
+  )
+    .then((client) => {
+      console.log(console.log("Connected"));
+      // This is to keep the connection alive and not having to connect the db each time
+      _db = client.db("shop");
+      callback();
+    })
+    .catch((err) => {
+      console.log(err);
+      throw err;
+    });
+};
 
-// Database name, user name, password
-const sequelize = new Sequalize("node-js", "root", "root", {
-  dialect: "mysql",
-  host: "localhost",
-});
+const getDb = () => {
+  if (_db) {
+    return _db;
+  }
+  throw "No database found";
+};
 
-module.exports = sequelize;
+exports.mongoConnect = mongoConnect;
+exports.getDb = getDb;

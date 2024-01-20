@@ -9,7 +9,6 @@ export default function Cart() {
     getCartItems();
   }, []);
 
-  console.log(cartItems);
   async function getCartItems() {
     try {
       const response = await fetch(`http://localhost:8000/cart`);
@@ -64,13 +63,10 @@ export default function Cart() {
           {cartItems.map((item) => {
             return (
               <div
-                key={item.id}
+                key={item._id}
                 className="p-10 mb-8 bg-white rounded-md shadow dark:bg-gray-800 sm:flex sm:items-center xl:py-5 xl:px-12"
               >
-                <Link
-                  to={`http:localhost://product/${item.id}`}
-                  className="mr-6 md:mr-12"
-                >
+                <Link to={`/products/${item._id}`} className="mr-6 md:mr-12">
                   <img
                     src={item.imageUrl}
                     alt={item.title}
@@ -80,7 +76,7 @@ export default function Cart() {
                 <div>
                   <Link
                     className="inline-block mb-1 text-lg font-medium hover:underline dark:text-gray-400"
-                    to={`http:localhost://product/${item.id}`}
+                    to={`/products/${item._id}`}
                   >
                     {item.title}
                   </Link>
@@ -88,12 +84,12 @@ export default function Cart() {
                     <p className="text-sm font-medium dark:text-gray-400">
                       <span>Qty:</span>
                       <span className="ml-2 text-gray-400">
-                        {item.cartItem.quantity}
+                        {item.quantity}
                       </span>
                     </p>
                   </div>
                   <button
-                    onClick={() => handleDelete(item.id, item.price)}
+                    onClick={() => handleDelete(item._id, item.price)}
                     className="p-2 my-4 bg-blue-700 text-white rounded-md"
                   >
                     Delete

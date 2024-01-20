@@ -11,6 +11,7 @@ export default function Orders() {
 
         if (response.ok) {
           const result = await response.json();
+          console.log(result);
           setOrders(result);
         }
       } catch (err) {
@@ -38,19 +39,19 @@ export default function Orders() {
           </h2>
           {orders.map((order) => {
             return (
-              <div key={order.id}>
+              <div key={order._id}>
                 <p className="text-lg mr-4 font-medium dark:text-gray-400">
                   <span>Order# </span>
-                  <span className="ml-2 text-gray-400">{order.id}</span>
+                  <span className="ml-2 text-gray-400">{order._id}</span>
                 </p>
-                {order.products.map((product) => {
+                {order.items.map((product) => {
                   return (
                     <div
-                      key={product.id}
+                      key={product._id}
                       className="p-10 mb-8 bg-white rounded-md shadow dark:bg-gray-800 sm:flex sm:items-center xl:py-5 xl:px-12"
                     >
                       <Link
-                        to={`http:localhost://product/${product.id}`}
+                        to={`http:localhost://product/${product._id}`}
                         className="mr-6 md:mr-12"
                       >
                         <img
@@ -70,7 +71,7 @@ export default function Orders() {
                           <p className="text-sm mr-4 font-medium dark:text-gray-400">
                             <span>Qty:</span>
                             <span className="ml-2 text-gray-400">
-                              {product.orderItem.quantity}
+                              {product.quantity}
                             </span>
                           </p>
                           <p className="text-sm mr-4 font-medium dark:text-gray-400">

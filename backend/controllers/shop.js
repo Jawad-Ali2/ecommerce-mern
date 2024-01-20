@@ -1,8 +1,8 @@
 const Product = require("../models/products");
-const Cart = require("../models/cart");
+// const Cart = require("../models/cart");
 
 const getAllProducts = (req, res) => {
-  Product.findAll()
+  Product.fetchAll()
     .then((products) => {
       res.status(200).send(products);
     })
@@ -13,7 +13,8 @@ const getAllProducts = (req, res) => {
 
 const getProductDetails = (req, res) => {
   const productId = req.params.id;
-  Product.findByPk(productId)
+
+  Product.findById(productId)
     .then((product) => {
       res.status(200).send(product);
     })
@@ -21,7 +22,7 @@ const getProductDetails = (req, res) => {
 };
 
 const getIndex = (req, res) => {
-  Product.findAll()
+  Product.fetchAll()
     .then((products) => {
       res.status(200).send(products);
     })
@@ -31,16 +32,10 @@ const getIndex = (req, res) => {
 };
 
 const getCart = (req, res) => {
-  console.log("klfjgd");
   req.user
     .getCart()
-    .then((cartProducts) => {
-      return cartProducts
-        .getProducts()
-        .then((products) => {
-          res.status(200).send(products);
-        })
-        .catch((err) => console.log(err));
+    .then((products) => {
+      res.status(200).send(products);
     })
     .catch((err) => {
       console.log(err);
@@ -49,42 +44,15 @@ const getCart = (req, res) => {
 
 const postToCart = (req, res) => {
   const product = req.body.product;
-  const prodId = product.id;
-  let fetchedCart;
-  let newQuantity = 1;
 
   req.user
-    .getCart()
-    .then((cart) => {
-      fetchedCart = cart;
-      return cart.getProducts({ where: { id: product.id } });
-    })
-    .then((products) => {
-      let product;
-      if (products.length > 0) {
-        product = products[0];
-      }
-      if (product) {
-        const oldQuantity = product.cartItem.quantity;
-        newQuantity = oldQuantity + 1;
-        return product;
-      }
-
-      return Product.findByPk(prodId);
-    })
-    .then((product) => {
-      return fetchedCart.addProduct(product, {
-        through: { quantity: newQuantity },
-      });
-    })
+    .addToCart(product)
     .then(() => {
       res.status(200).json({ message: "Added to cart successfully" });
     })
     .catch((err) => {
-      console.log(err);
+      res.status(500).json({ message: err });
     });
-  // console.log(product);
-  // Cart.addProduct(product);
 };
 
 const deleteFromCart = (req, res) => {
@@ -92,15 +60,7 @@ const deleteFromCart = (req, res) => {
   const price = req.body.price;
 
   req.user
-    .getCart()
-    .then((cart) => {
-      return cart.getProducts({ where: { id: id } });
-    })
-    .then((products) => {
-      const product = products[0];
-
-      product.cartItem.destroy();
-    })
+    .deleteFromCart(id)
     .then(() => {
       res.status(200).json({ message: "Delete from cart successfully" });
     })
@@ -110,30 +70,8 @@ const deleteFromCart = (req, res) => {
 };
 
 const postAddOrders = (req, res) => {
-  let fetchedCart;
-  let cartProducts;
   req.user
-    .getCart()
-    .then((cart) => {
-      fetchedCart = cart;
-      return cart.getProducts();
-    })
-    .then((products) => {
-      cartProducts = products;
-      return req.user.createOrder();
-    })
-    .then((order) => {
-      order.addProducts(
-        cartProducts.map((product) => {
-          product.orderItem = { quantity: product.cartItem.quantity };
-
-          return product;
-        })
-      );
-    })
-    .then(() => {
-      return fetchedCart.setProducts(null);
-    })
+    .addOrder()
     .then(() => {
       res.status(201).json({ message: "Order created" });
     })
@@ -145,7 +83,7 @@ const postAddOrders = (req, res) => {
 const getOrders = (req, res) => {
   req.user
     // include here says: Also give products along with the orders. (We have the association made)
-    .getOrders({ include: ["products"] })
+    .getOrders()
     .then((orders) => {
       res.status(200).send(orders);
     })
@@ -154,9 +92,9 @@ const getOrders = (req, res) => {
     });
 };
 
-const getCheckout = (req, res) => {
-  res.send("Nothing to see here");
-};
+// const getCheckout = (req, res) => {
+//   res.send("Nothing to see here");
+// };
 
 module.exports = {
   getAllProducts,
@@ -167,5 +105,5 @@ module.exports = {
   deleteFromCart,
   postAddOrders,
   getOrders,
-  getCheckout,
+  // getCheckout,
 };
