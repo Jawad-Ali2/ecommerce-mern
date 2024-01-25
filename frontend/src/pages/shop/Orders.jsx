@@ -11,7 +11,6 @@ export default function Orders() {
 
         if (response.ok) {
           const result = await response.json();
-          console.log(result);
           setOrders(result);
         }
       } catch (err) {
@@ -44,28 +43,28 @@ export default function Orders() {
                   <span>Order# </span>
                   <span className="ml-2 text-gray-400">{order._id}</span>
                 </p>
-                {order.items.map((product) => {
+                {order.products.map((product) => {
                   return (
                     <div
-                      key={product._id}
+                      key={product.product._id}
                       className="p-10 mb-8 bg-white rounded-md shadow dark:bg-gray-800 sm:flex sm:items-center xl:py-5 xl:px-12"
                     >
                       <Link
-                        to={`http:localhost://product/${product._id}`}
+                        to={`http:localhost://product/${product.product._id}`}
                         className="mr-6 md:mr-12"
                       >
                         <img
-                          src={product.imageUrl}
-                          alt={product.title}
+                          src={product.product.imageUrl}
+                          alt={product.product.title}
                           className=" w-full lg:w-[80px] h-[200px] lg:h-[80px]  object-cover  mx-auto mb-6 sm:mb-0 "
                         />
                       </Link>
                       <div>
                         <Link
                           className="inline-block mb-1 text-lg font-medium hover:underline dark:text-gray-400"
-                          to={`http:localhost://product/${product.id}`}
+                          to={`http:localhost://product/${product.product.id}`}
                         >
-                          {product.title}
+                          {product.product.title}
                         </Link>
                         <div className="flex flex-wrap">
                           <p className="text-sm mr-4 font-medium dark:text-gray-400">
@@ -77,7 +76,7 @@ export default function Orders() {
                           <p className="text-sm mr-4 font-medium dark:text-gray-400">
                             <span>Price:</span>
                             <span className="ml-2 text-gray-400">
-                              {product.price}
+                              $ {product.product.price}
                             </span>
                           </p>
                         </div>

@@ -4,6 +4,7 @@ import Navbar from "./components/Navbar.jsx";
 import "./index.css";
 import router from "./routes/route.jsx";
 import { Outlet, RouterProvider } from "react-router-dom";
+import { AuthProvider } from "./context/AuthContext.jsx";
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
@@ -14,8 +15,10 @@ ReactDOM.createRoot(document.getElementById("root")).render(
 export function RootLayout() {
   return (
     <>
-      <Navbar />
-      <Outlet />
+      <AuthProvider>
+        <Navbar />
+        <Outlet />
+      </AuthProvider>
     </>
   );
 }

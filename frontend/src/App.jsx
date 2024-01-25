@@ -3,15 +3,19 @@ import ProductCard from "./components/ProductCard";
 
 function App() {
   const [data, setData] = useState([]);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   useEffect(() => {
     async function getData() {
       try {
-        const response = await fetch("http://localhost:8000/home");
+        const response = await fetch("http://localhost:8000/home", {
+          credentials: "include",
+        });
 
         if (response.ok) {
           const items = await response.json();
-          setData(items);
+          setData(items.products);
+          setIsLoggedIn(items.isLoggedIn);
         }
       } catch (error) {
         console.error(error);

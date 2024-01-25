@@ -6,14 +6,14 @@ const postAddProduct = (req, res) => {
   const imageUrl = req.body.imageUrl;
   const price = req.body.price;
   const description = req.body.description;
-  const product = new Product(
-    title,
-    price,
-    description,
-    imageUrl,
-    null,
-    req.user._id
-  );
+  const product = new Product({
+    title: title,
+    price: price,
+    description: description,
+    imageUrl: imageUrl,
+    //* Here the mongoose takes the id from the user automatically due to ref property..
+    userId: req.user,
+  });
   product
     .save()
     .then(() => {
@@ -23,15 +23,9 @@ const postAddProduct = (req, res) => {
 };
 
 const getProducts = (req, res) => {
-  // req.user
-  //   .getProducts()
-  //   .then((products) => {
-  //     res.status(200).send(products);
-  //   })
-  //   .catch((err) => {
-  //     res.status(500).json({ message: err });
-  //   });
-  Product.fetchAll()
+  Product.find()
+    // .select("title price -_id") // Select or unselect what we want from the database // * This will fetch only title price and exclude _id
+    // .populate("userId") // Populate will fetch the user with userId
     .then((products) => {
       res.status(200).send(products);
     })
@@ -56,17 +50,18 @@ const postEditProduct = (req, res) => {
   const image = req.body.image;
   const price = req.body.price;
   const description = req.body.description;
-  const product = new Product(
-    title,
-    price,
-    description,
-    image,
-    id,
-    req.user._id
-  );
 
-  product
-    .save()
+  Product.updateOne(
+    { _id: id },
+    {
+      $set: {
+        title: title,
+        price: price,
+        description: description,
+        imageUrl: image,
+      },
+    }
+  )
     .then(() =>
       res.status(200).json({ message: "Product updated successfully" })
     )
@@ -76,15 +71,8 @@ const postEditProduct = (req, res) => {
 const postDeleteProduct = (req, res) => {
   const id = req.params.id;
 
-  // Product.findByPk(id)
-  //   .then((product) => product.destroy())
-  //   .then(() => Product.findAll())
-  //   .then((product) => res.status(200).send(product))
-  //   .catch((err) => res.status(500).json({ message: err }));
-
-  // Product.findById(id).then;
-  Product.deleteById(id)
-    .then(() => Product.fetchAll())
+  Product.deleteOne({ _id: id })
+    .then(() => Product.find())
     .then((products) => {
       res.status(200).send(products);
     })

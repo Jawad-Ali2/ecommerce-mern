@@ -11,7 +11,9 @@ export default function Cart() {
 
   async function getCartItems() {
     try {
-      const response = await fetch(`http://localhost:8000/cart`);
+      const response = await fetch(`http://localhost:8000/cart`, {
+        credentials: "include",
+      });
       if (response.ok) {
         const result = await response.json();
         setCartItems(result);
@@ -21,14 +23,11 @@ export default function Cart() {
     }
   }
 
-  async function handleDelete(id, productPrice) {
+  async function handleDelete(id) {
     try {
       const response = await fetch(`http://localhost:8000/delete-item/${id}`, {
         method: "DELETE",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          price: productPrice,
-        }),
+        credentials: "include",
       });
       if (response.ok) {
         getCartItems();
@@ -42,8 +41,7 @@ export default function Cart() {
     try {
       const response = await fetch("http://localhost:8000/add-order", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({}),
+        credentials: "include",
       });
       if (response.ok) {
         navigate("/orders");
@@ -63,22 +61,25 @@ export default function Cart() {
           {cartItems.map((item) => {
             return (
               <div
-                key={item._id}
+                key={item.productId._id}
                 className="p-10 mb-8 bg-white rounded-md shadow dark:bg-gray-800 sm:flex sm:items-center xl:py-5 xl:px-12"
               >
-                <Link to={`/products/${item._id}`} className="mr-6 md:mr-12">
+                <Link
+                  to={`/products/${item.productId._id}`}
+                  className="mr-6 md:mr-12"
+                >
                   <img
-                    src={item.imageUrl}
-                    alt={item.title}
+                    src={item.productId.imageUrl}
+                    alt={item.productId.title}
                     className=" w-full lg:w-[80px] h-[200px] lg:h-[80px]  object-cover  mx-auto mb-6 sm:mb-0 "
                   />
                 </Link>
                 <div>
                   <Link
                     className="inline-block mb-1 text-lg font-medium hover:underline dark:text-gray-400"
-                    to={`/products/${item._id}`}
+                    to={`/products/${item.productId._id}`}
                   >
-                    {item.title}
+                    {item.productId.title}
                   </Link>
                   <div className="flex flex-wrap">
                     <p className="text-sm font-medium dark:text-gray-400">
@@ -89,7 +90,7 @@ export default function Cart() {
                     </p>
                   </div>
                   <button
-                    onClick={() => handleDelete(item._id, item.price)}
+                    onClick={() => handleDelete(item.productId._id)}
                     className="p-2 my-4 bg-blue-700 text-white rounded-md"
                   >
                     Delete

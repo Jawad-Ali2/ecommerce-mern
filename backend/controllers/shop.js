@@ -1,10 +1,13 @@
+const Order = require("../models/orders");
 const Product = require("../models/products");
-// const Cart = require("../models/cart");
 
 const getAllProducts = (req, res) => {
-  Product.fetchAll()
+  Product.find()
     .then((products) => {
-      res.status(200).send(products);
+      // const cookies = req.get("Cookie");
+      res
+        .status(200)
+        .send({ products: products, isLoggedIn: req.session.loggedIn });
     })
     .catch((err) => {
       res.status(500).json({ message: err });
@@ -22,7 +25,7 @@ const getProductDetails = (req, res) => {
 };
 
 const getIndex = (req, res) => {
-  Product.fetchAll()
+  Product.find()
     .then((products) => {
       res.status(200).send(products);
     })
@@ -33,8 +36,9 @@ const getIndex = (req, res) => {
 
 const getCart = (req, res) => {
   req.user
-    .getCart()
-    .then((products) => {
+    .populate("cart.items.productId")
+    .then((user) => {
+      const products = user.cart.items;
       res.status(200).send(products);
     })
     .catch((err) => {
@@ -44,7 +48,6 @@ const getCart = (req, res) => {
 
 const postToCart = (req, res) => {
   const product = req.body.product;
-
   req.user
     .addToCart(product)
     .then(() => {
@@ -57,10 +60,9 @@ const postToCart = (req, res) => {
 
 const deleteFromCart = (req, res) => {
   const id = req.params.id;
-  const price = req.body.price;
 
   req.user
-    .deleteFromCart(id)
+    .removeFromCart(id)
     .then(() => {
       res.status(200).json({ message: "Delete from cart successfully" });
     })
@@ -71,7 +73,26 @@ const deleteFromCart = (req, res) => {
 
 const postAddOrders = (req, res) => {
   req.user
-    .addOrder()
+    .populate("cart.items.productId")
+    .then((user) => {
+      const products = user.cart.items.map((product) => {
+        return {
+          quantity: product.quantity,
+          product: { ...product.productId._doc },
+        };
+      });
+      const order = new Order({
+        user: {
+          name: req.user.name,
+          userId: req.user,
+        },
+        products: products,
+      });
+      return order.save();
+    })
+    .then(() => {
+      return req.user.clearCart();
+    })
     .then(() => {
       res.status(201).json({ message: "Order created" });
     })
@@ -81,9 +102,7 @@ const postAddOrders = (req, res) => {
 };
 
 const getOrders = (req, res) => {
-  req.user
-    // include here says: Also give products along with the orders. (We have the association made)
-    .getOrders()
+  Order.find({ "user.userId": req.user._id })
     .then((orders) => {
       res.status(200).send(orders);
     })
@@ -93,7 +112,7 @@ const getOrders = (req, res) => {
 };
 
 // const getCheckout = (req, res) => {
-//   res.send("Nothing to see here");
+// res.send("Nothing to see here");
 // };
 
 module.exports = {

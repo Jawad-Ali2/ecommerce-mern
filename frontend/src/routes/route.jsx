@@ -8,6 +8,8 @@ import Orders from "../pages/shop/Orders";
 import ProductDetails from "../pages/shop/ProductDetails";
 import AddProduct from "../pages/admin/AddProduct";
 import EditProduct from "../pages/admin/EditProduct";
+import LoginForm from "../components/LoginForm";
+import SignUpForm from "../components/SignUpForm";
 
 const router = createBrowserRouter([
   {
@@ -18,6 +20,16 @@ const router = createBrowserRouter([
         index: true,
         element: <App />,
       },
+      {
+        path: "/login",
+        element: <LoginForm />,
+      },
+
+      {
+        path: "/signup",
+        element: <SignUpForm />,
+      },
+
       {
         path: "/products",
         // element to be decide

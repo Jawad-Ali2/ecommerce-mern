@@ -1,10 +1,13 @@
+import { useContext } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { AuthContext } from "../context/AuthContext";
 
 export default function ProductCard({
   item,
   isAdmin = false,
   handleDelete = () => {}, // Optional function
 }) {
+  const { isAuthenticated } = useContext(AuthContext);
   const navigate = useNavigate();
 
   async function handleAddToCart(e) {
@@ -13,6 +16,7 @@ export default function ProductCard({
     try {
       const response = await fetch("http://localhost:8000/cart", {
         method: "POST",
+        credentials: "include",
         headers: { "Content-Type": "application/json" },
 
         body: JSON.stringify({
@@ -55,12 +59,14 @@ export default function ProductCard({
         </p>
         {!isAdmin ? (
           <div className="flex justify-between gap-[2rem] ">
-            <button
-              onClick={handleAddToCart}
-              className="px-3 py-2 text-sm font-medium text-center text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
-            >
-              Add to cart
-            </button>
+            {isAuthenticated && (
+              <button
+                onClick={handleAddToCart}
+                className="px-3 py-2 text-sm font-medium text-center text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+              >
+                Add to cart
+              </button>
+            )}
             <Link
               to={`/products/${item._id}`}
               className="inline-flex items-center px-3 py-2 text-sm font-medium text-center text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
