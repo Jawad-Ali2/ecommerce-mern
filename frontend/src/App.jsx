@@ -1,9 +1,10 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
 import ProductCard from "./components/ProductCard";
+import { AuthContext } from "./context/AuthContext";
 
 function App() {
   const [data, setData] = useState([]);
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const { setIsAuthenticated } = useContext(AuthContext);
 
   useEffect(() => {
     async function getData() {
@@ -15,7 +16,7 @@ function App() {
         if (response.ok) {
           const items = await response.json();
           setData(items.products);
-          setIsLoggedIn(items.isLoggedIn);
+          setIsAuthenticated(items.isLoggedIn);
         }
       } catch (error) {
         console.error(error);

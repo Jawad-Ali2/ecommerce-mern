@@ -1,6 +1,7 @@
 import { useContext, useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { AuthContext } from "../../context/AuthContext";
+import Cookie from "js-cookie";
 
 export default function ProductDetails() {
   const [product, setProduct] = useState([]);
@@ -28,7 +29,10 @@ export default function ProductDetails() {
     try {
       const response = await fetch("http://localhost:8000/cart", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          "CSRF-TOKEN": Cookie.get("CSRF-TOKEN"),
+        },
 
         body: JSON.stringify({
           product: product,

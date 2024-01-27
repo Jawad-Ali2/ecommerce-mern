@@ -1,22 +1,25 @@
 const cors = require("cors");
 const bodyParse = require("body-parser");
+const cookieParse = require("cookie-parser");
 require("dotenv").config();
 const express = require("express");
 const mongoose = require("mongoose");
 const session = require("express-session");
 const MongoDBStore = require("connect-mongodb-session")(session);
+const csrf = require("csurf");
+const csrfMiddleware = require("./middleware/csrfToken");
 
 const adminData = require("./routes/admin");
 const shopRoutes = require("./routes/shop");
 const authRoutes = require("./routes/auth");
 const User = require("./models/user");
-const { ObjectId } = require("mongodb");
 
 const store = new MongoDBStore({
   uri: `mongodb+srv://${process.env.MONGODB_USERNAME}:${process.env.MONGODB_PASSWORD}@cluster0.i4mh4vu.mongodb.net/shop`,
   collection: "sessions",
 });
 const app = express();
+const csrfProtection = csrf({ cookie: true });
 
 app.use(
   cors({
@@ -27,13 +30,14 @@ app.use(
   })
 );
 app.use(bodyParse.urlencoded({ extended: false }));
+app.use(cookieParse());
 app.use(bodyParse.json());
 
 app.use(
   session({
     secret: "secret",
     resave: false,
-    saveUninitialized: false,
+    saveUninitialized: true,
     store: store,
     // cookie: {
     //   // Secure is for https and it saves CSRF (Cross Site Request Forgery)
@@ -43,8 +47,13 @@ app.use(
   })
 );
 
+//* This middleware is for setting up csrf
+app.use(csrfProtection);
+
+//* First we check if user is loggedIn or not to set csfr cookie
 app.use((req, res, next) => {
   if (!req.session.user) {
+    // res.cookie("CSRF-TOKEN", req.csrfToken());
     return next();
   }
   // this middleware function only run when the server is up and running on localhost
@@ -59,6 +68,9 @@ app.use((req, res, next) => {
     });
 });
 
+//* This middleware is for setting the csrf cookie
+app.use(csrfMiddleware);
+
 app.use("/admin", adminData.router);
 app.use(shopRoutes.router);
 app.use(authRoutes.router);
@@ -72,16 +84,6 @@ mongoose
     `mongodb+srv://${process.env.MONGODB_USERNAME}:${process.env.MONGODB_PASSWORD}@cluster0.i4mh4vu.mongodb.net/shop`
   )
   .then(() => {
-    User.findOne().then((user) => {
-      if (!user) {
-        const user = new User({
-          name: "Jawad",
-          email: "jawadali66667@gmail.com",
-          cart: { items: [] },
-        });
-        user.save();
-      }
-    });
     app.listen(8000);
   })
   .catch((err) => {

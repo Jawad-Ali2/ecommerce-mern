@@ -13,7 +13,10 @@ export default function EditProduct() {
   async function fetchProductData() {
     try {
       const response = await fetch(
-        `http://localhost:8000/admin/edit-product/${params.id}`
+        `http://localhost:8000/admin/edit-product/${params.id}`,
+        {
+          credentials: "include",
+        }
       );
       const result = await response.json();
       setProduct(result);

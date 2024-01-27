@@ -1,38 +1,21 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import Cookie from "js-cookie";
 import { AuthContext } from "../context/AuthContext";
+import Cookie from "js-cookie";
 
 function Navbar() {
   // const [isAuthenticated, setIsAuthenticated] = useState(false);
   const { isAuthenticated, logout } = useContext(AuthContext);
   const navigate = useNavigate();
 
-  // useEffect(() => {
-  //   async function getData() {
-  //     try {
-  //       const response = await fetch("http://localhost:8000/home", {
-  //         credentials: "include",
-  //       });
-
-  //       if (response.ok) {
-  //         const items = await response.json();
-  //         // setIsAuthenticated(items.isLoggedIn);
-  //         login();
-  //       }
-  //     } catch (error) {
-  //       console.error(error);
-  //     }
-  //   }
-
-  //   getData();
-  // }, []);
-
   async function handleLogout(e) {
     e.preventDefault();
 
     const response = await fetch("http://localhost:8000/logout", {
       method: "POST",
+      headers: {
+        "CSRF-TOKEN": Cookie.get("CSRF-TOKEN"),
+      },
       credentials: "include",
     });
 

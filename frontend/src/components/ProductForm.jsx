@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
+import Cookie from "js-cookie";
 
 function ProductForm({ isEdit = false, product = {} }) {
   const [title, setTitle] = useState(() => product.title);
@@ -13,9 +14,11 @@ function ProductForm({ isEdit = false, product = {} }) {
     e.preventDefault();
     try {
       const response = await fetch("http://localhost:8000/admin/add-product", {
+        credentials: "include",
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          "CSRF-TOKEN": Cookie.get("CSRF-TOKEN"),
         },
         body: JSON.stringify({
           id: crypto.randomUUID(),
@@ -39,9 +42,11 @@ function ProductForm({ isEdit = false, product = {} }) {
     e.preventDefault();
     try {
       const response = await fetch("http://localhost:8000/admin/edit-product", {
+        credentials: "include",
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          "CSRF-TOKEN": Cookie.get("CSRF-TOKEN"),
         },
         body: JSON.stringify({
           id: params.id,

@@ -1,6 +1,7 @@
 import { useContext } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { AuthContext } from "../context/AuthContext";
+import Cookie from "js-cookie";
 
 export default function LoginForm() {
   const { login } = useContext(AuthContext);
@@ -12,6 +13,15 @@ export default function LoginForm() {
     const response = await fetch("http://localhost:8000/login", {
       method: "POST",
       credentials: "include",
+
+      headers: {
+        "Content-Type": "application/json",
+        "CSRF-TOKEN": Cookie.get("CSRF-TOKEN"),
+      },
+      body: JSON.stringify({
+        email: e.target.email.value,
+        password: e.target.password.value,
+      }),
     });
     if (response.ok) {
       login();

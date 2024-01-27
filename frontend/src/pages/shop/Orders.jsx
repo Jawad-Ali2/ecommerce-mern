@@ -1,17 +1,22 @@
 import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 export default function Orders() {
   const [orders, setOrders] = useState([]);
+  const navigate = useNavigate();
 
   useEffect(() => {
     async function fetchOrders() {
       try {
-        const response = await fetch("http://localhost:8000/orders");
+        const response = await fetch("http://localhost:8000/orders", {
+          credentials: "include",
+        });
 
         if (response.ok) {
           const result = await response.json();
           setOrders(result);
+        } else {
+          navigate("/login");
         }
       } catch (err) {
         console.log(err);

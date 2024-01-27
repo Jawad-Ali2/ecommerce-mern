@@ -5,9 +5,10 @@ const getAllProducts = (req, res) => {
   Product.find()
     .then((products) => {
       // const cookies = req.get("Cookie");
-      res
-        .status(200)
-        .send({ products: products, isLoggedIn: req.session.loggedIn });
+      res.status(200).send({
+        products: products,
+        isLoggedIn: req.session.loggedIn ? true : false,
+      });
     })
     .catch((err) => {
       res.status(500).json({ message: err });
@@ -83,7 +84,8 @@ const postAddOrders = (req, res) => {
       });
       const order = new Order({
         user: {
-          name: req.user.name,
+          // name: req.user.name,
+          email: req.user.email,
           userId: req.user,
         },
         products: products,
@@ -107,7 +109,7 @@ const getOrders = (req, res) => {
       res.status(200).send(orders);
     })
     .catch((err) => {
-      res.status(400).json({ message: err });
+      res.status(500).json({ message: err });
     });
 };
 

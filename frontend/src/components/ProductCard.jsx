@@ -1,6 +1,7 @@
 import { useContext } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { AuthContext } from "../context/AuthContext";
+import Cookie from "js-cookie";
 
 export default function ProductCard({
   item,
@@ -17,7 +18,10 @@ export default function ProductCard({
       const response = await fetch("http://localhost:8000/cart", {
         method: "POST",
         credentials: "include",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          "CSRF-TOKEN": Cookie.get("CSRF-TOKEN"),
+        },
 
         body: JSON.stringify({
           product: item,

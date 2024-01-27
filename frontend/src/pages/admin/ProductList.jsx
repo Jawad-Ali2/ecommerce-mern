@@ -1,8 +1,11 @@
 import { useEffect, useState } from "react";
 import ProductCard from "../../components/ProductCard";
+import Cookie from "js-cookie";
+import { useNavigate } from "react-router-dom";
 
 export default function ProductList() {
   const [data, setData] = useState([]);
+  const navigate = useNavigate();
 
   useEffect(() => {
     getData();
@@ -10,9 +13,16 @@ export default function ProductList() {
 
   async function getData() {
     try {
-      const response = await fetch("http://localhost:8000/admin/products");
-      const items = await response.json();
-      setData(items);
+      const response = await fetch("http://localhost:8000/admin/products", {
+        credentials: "include",
+      });
+
+      if (response.ok) {
+        const items = await response.json();
+        setData(items);
+      } else {
+        navigate("/login");
+      }
     } catch (error) {
       console.error(error);
     }
@@ -23,7 +33,11 @@ export default function ProductList() {
       const response = await fetch(
         `http://localhost:8000/admin/delete-product/${id}`,
         {
+          credentials: "include",
           method: "DELETE",
+          headers: {
+            "CSRF-TOKEN": Cookie.get("CSRF-TOKEN"),
+          },
         }
       );
       if (response.ok) {

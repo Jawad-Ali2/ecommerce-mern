@@ -17,6 +17,8 @@ export default function Cart() {
       if (response.ok) {
         const result = await response.json();
         setCartItems(result);
+      } else {
+        navigate("/login");
       }
     } catch (error) {
       console.log(error);
@@ -31,6 +33,8 @@ export default function Cart() {
       });
       if (response.ok) {
         getCartItems();
+      } else {
+        navigate("/login");
       }
     } catch (error) {
       console.log(error);
@@ -45,6 +49,8 @@ export default function Cart() {
       });
       if (response.ok) {
         navigate("/orders");
+      } else {
+        navigate("/login");
       }
     } catch (err) {
       console.log(err);

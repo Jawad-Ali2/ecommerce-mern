@@ -1,8 +1,10 @@
 import { useState, useEffect } from "react";
 import ProductCard from "./components/ProductCard";
+import { useNavigate } from "react-router-dom";
 
 function AdminProducts() {
   const [data, setData] = useState([]);
+  const navigate = useNavigate();
 
   useEffect(() => {
     getData();
@@ -10,10 +12,18 @@ function AdminProducts() {
 
   async function getData() {
     try {
-      const response = await fetch("http://localhost:8000/admin/products");
-      const items = await response.json();
-      console.log(items);
-      setData(items);
+      const response = await fetch("http://localhost:8000/admin/products", {
+        credentials: "include",
+      });
+
+      if (response.ok) {
+        console.log("ldkjgad");
+        const items = await response.json();
+        setData(items);
+      } else {
+        console.log("ldkgjsjdgkdj");
+        navigate("/login");
+      }
     } catch (error) {
       console.error(error);
     }
