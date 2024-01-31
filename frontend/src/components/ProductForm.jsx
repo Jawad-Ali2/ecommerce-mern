@@ -10,6 +10,8 @@ function ProductForm({ isEdit = false, product = {} }) {
   const navigate = useNavigate();
   const params = useParams();
 
+  console.log(image);
+
   async function handleAddSubmit(e) {
     e.preventDefault();
     try {
@@ -74,6 +76,7 @@ function ProductForm({ isEdit = false, product = {} }) {
       <form
         className="text-center"
         onSubmit={isEdit ? handleEditSubmit : handleAddSubmit}
+        encType="multipart/form-data"
       >
         <div>
           <label htmlFor="title">Title</label>

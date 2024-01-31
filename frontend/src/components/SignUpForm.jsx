@@ -7,10 +7,6 @@ export default function SignUpForm() {
   async function handleSignup(e) {
     e.preventDefault();
 
-    console.log(e.target.email.value);
-    console.log(e.target.password.value);
-    console.log(e.target["confirm-password"].value);
-
     const response = await fetch("http://localhost:8000/signup", {
       method: "POST",
       credentials: "include",

@@ -7,6 +7,8 @@ export default function LoginForm() {
   const { login } = useContext(AuthContext);
   const navigate = useNavigate();
 
+  console.log(Cookie.get("_csrf"));
+
   async function handleLogin(e) {
     e.preventDefault();
 
@@ -95,7 +97,7 @@ export default function LoginForm() {
                   </div>
                 </div>
                 <Link
-                  to="#"
+                  to="/reset"
                   className="text-sm font-medium text-white text-primary-600 hover:underline dark:text-primary-500"
                 >
                   Forgot password?

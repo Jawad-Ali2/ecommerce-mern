@@ -14,11 +14,12 @@ const shopRoutes = require("./routes/shop");
 const authRoutes = require("./routes/auth");
 const User = require("./models/user");
 
+const app = express();
+
 const store = new MongoDBStore({
   uri: `mongodb+srv://${process.env.MONGODB_USERNAME}:${process.env.MONGODB_PASSWORD}@cluster0.i4mh4vu.mongodb.net/shop`,
   collection: "sessions",
 });
-const app = express();
 const csrfProtection = csrf({ cookie: true });
 
 app.use(
@@ -37,13 +38,14 @@ app.use(
   session({
     secret: "secret",
     resave: false,
-    saveUninitialized: true,
+    saveUninitialized: false,
     store: store,
-    // cookie: {
-    //   // Secure is for https and it saves CSRF (Cross Site Request Forgery)
-    //   // sameSite: "None",
-    //   // secure: true,
-    // },
+    cookie: {
+      // Secure is for https and it saves CSRF (Cross Site Request Forgery)
+      httpOnly: true,
+      // sameSite: "None",
+      // secure: true,
+    },
   })
 );
 
@@ -53,7 +55,6 @@ app.use(csrfProtection);
 //* First we check if user is loggedIn or not to set csfr cookie
 app.use((req, res, next) => {
   if (!req.session.user) {
-    // res.cookie("CSRF-TOKEN", req.csrfToken());
     return next();
   }
   // this middleware function only run when the server is up and running on localhost

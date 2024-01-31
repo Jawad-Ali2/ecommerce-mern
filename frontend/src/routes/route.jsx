@@ -10,6 +10,8 @@ import AddProduct from "../pages/admin/AddProduct";
 import EditProduct from "../pages/admin/EditProduct";
 import LoginForm from "../components/LoginForm";
 import SignUpForm from "../components/SignUpForm";
+import ResetForm from "../components/Reset";
+import PasswordReset from "../components/PasswordReset";
 
 const router = createBrowserRouter([
   {
@@ -28,6 +30,19 @@ const router = createBrowserRouter([
       {
         path: "/signup",
         element: <SignUpForm />,
+      },
+      {
+        path: "/reset",
+        children: [
+          {
+            index: true,
+            element: <ResetForm />,
+          },
+          {
+            path: ":token",
+            element: <PasswordReset />,
+          },
+        ],
       },
 
       {

@@ -23,7 +23,7 @@ const postAddProduct = (req, res) => {
 };
 
 const getProducts = (req, res) => {
-  Product.find()
+  Product.find({ userId: req.user._id })
     // .select("title price -_id") // Select or unselect what we want from the database // * This will fetch only title price and exclude _id
     // .populate("userId") // Populate will fetch the user with userId
     .then((products) => {
@@ -50,7 +50,9 @@ const postEditProduct = (req, res) => {
   const image = req.body.image;
   const price = req.body.price;
   const description = req.body.description;
-
+  if (id.toString() !== req.user._id.toString()) {
+    throw new Error("Invalid user ID");
+  }
   Product.updateOne(
     { _id: id },
     {
@@ -71,7 +73,7 @@ const postEditProduct = (req, res) => {
 const postDeleteProduct = (req, res) => {
   const id = req.params.id;
 
-  Product.deleteOne({ _id: id })
+  Product.deleteOne({ _id: id, userId: req.user._id })
     .then(() => Product.find())
     .then((products) => {
       res.status(200).send(products);
